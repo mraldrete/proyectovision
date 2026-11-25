@@ -7,6 +7,26 @@ __pycache__/
 venv/
 .venv/
 
+ === Datos y modelos (NO subir) ===
+data/
+runs_bona/
+runs_trees/
+*.pt
+*.onnx
+*.zip
+.neon_token
+
+# === Entornos ===
+.venv/
+.venv_yolo/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# === macOS ===
+.DS_Store
+EOF
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
