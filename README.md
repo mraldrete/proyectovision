@@ -35,33 +35,49 @@ Alternativa comparada: YOLOv8n preentrenado en COCO sin fine-tuning.
 
 Comparación de arquitecturas
 Modelo	mAP@0.5	mAP@0.5:0.95	Parámetros	Tamaño (MB)	Latencia (ms/img)
+
 YOLOv8n fine-tuned (elegido)	0.0363	0.0114	3.0 M	6.0	12.8 (MPS)
+
 YOLOv8n COCO (sin fine-tuning)	0.0000	0.0000	3.2 M	6.5	12.8 (MPS)
+
 Justificación: El modelo preentrenado en COCO no detecta árboles (mAP=0) porque no conoce la clase. El fine-tuning sobre NEON BONA aporta +0.036 mAP. Se intentó YOLOv8s (más capacidad), pero en MPS tardaba 20+ min/época por presión de memoria, inviable para el tiempo del proyecto. YOLOv8n ofrece el mejor balance latencia/tamaño/exactitud alcanzable con estos datos.
 
 ## 5. Resultados principales
 Métricas en test (2019, OOD temporal)
+
 Métrica	Valor
+
 mAP@0.5	0.0363
+
 mAP@0.5:0.95	0.0114
+
 Precision	0.0221
+
 Recall	0.532
+
 Comparación de versiones
+
 Versión	Train imgs	mAP@0.5	Recall	Causa
+
 v1 (1 árbol/img)	407	0.0005	0.02	Colapso: fondo domina
+
 v2 (multi-árbol)	127	0.037	0.25	Desbalance 1 vs 55
+
 v3 (filtrado ≥5)	80	0.041	0.186	Pocos datos
+
 v4 (STRIDE=128, elegido)	~300	0.036	0.532	Mejor recall, sobre-detecta
+
 Figuras: docs/figuras/entrenamiento_v2/results.png, confusion_matrix.png.
 
 ## 6. Instalación y reproducción (≤ 5 comandos)
-bash
-git clone https://github.com/mraldrete/proyectovision
-python3 -m venv .venv_yolo && source .venv_yolo/bin/activate
-pip install -r requirements.txt
-python src/download_neon.py && python src/prepare_bona_v2.py
-python src/train_local.py
+    ```bash
+    git clone https://github.com/mraldrete/proyectovision
+    python3 -m venv .venv_yolo && source .venv_yolo/bin/activate
+    pip install -r requirements.txt
+    python src/download_neon.py && python src/prepare_bona_v2.py
+    python src/train_local.py
 
+|
 En Mac Apple Silicon, el entrenamiento usa MPS. En otras plataformas, CPU o CUDA.
 
 ## 7. Demo (1 comando)
