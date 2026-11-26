@@ -1,31 +1,37 @@
-anyio==4.16.0
-click==8.5.1
-contourpy==1.4.0
-cycler==0.12.1
-datasets==5.2.0
-dill==0.4.1
-filelock==4.3.1
-fonttools==4.68.0
-fsspec==2026.9.0
-h11==0.16.0
-hf-xet==1.8.0
-httpcore2==2.16.2
-httpx2==2.16.2
-huggingface_hub==2.4.0
-idna==3.20
-kiwisolver==1.5.1
-matplotlib==3.11.2
-multiprocess==0.70.19
-numpy==2.5.5
-packaging==26.4
-pandas==3.1.1
-pillow==13.0.0
-pyarrow==26.0.1
-pyparsing==3.3.3
-python-dateutil==4.0.0
-PyYAML==6.0.4
-tqdm==4.70.1
-truststore==0.10.5
-typing_extensions==4.16.0
-tzdata==2026.6
-xxhash==4.1.0
+# Core
+numpy>=2.0,<3
+pandas>=2.2
+pillow>=10.0
+matplotlib>=3.8
+PyYAML>=6.0
+tqdm>=4.66
+
+# Deep learning
+torch>=2.4
+torchvision>=0.19
+ultralytics>=8.3.80
+
+# Datos geoespaciales
+geopandas>=1.0
+rasterio>=1.3
+fiona>=1.9
+pyproj>=3.6
+shapely>=2.0
+
+# Hugging Face
+datasets>=4.0
+huggingface_hub>=0.25
+
+# Export ONNX
+onnx>=1.16
+onnxruntime>=1.18
+onnxslim>=0.1
+onnxscript>=0.1
+
+# App
+PySide6>=6.7
+
+# Utilidades
+scikit-learn>=1.4
+requests>=2.31
+gdown>=5.1
