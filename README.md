@@ -81,8 +81,8 @@ Figuras: docs/figuras/entrenamiento_v2/results.png, confusion_matrix.png.
 En Mac Apple Silicon, el entrenamiento usa MPS. En otras plataformas, CPU o CUDA.
 
 ## 7. Demo (1 comando)
-
-python -m app.main
+        ```bash
+        python -m app.main
 
 Muestra una ventana PySide6 para subir una ortofoto, ver las cajas detectadas, el conteo de árboles y ajustar el umbral de confianza (1%–50%).
 
