@@ -1,5 +1,10 @@
 """App PySide6: sube ortofoto, cuenta árboles, muestra resultado.
-Uso: python -m app.main
+
+Uso:
+    python -m app.main
+
+Modelo: YOLO11n sobre HARV v2 (mAP50=0.587 en test).
+Umbral de confianza ajustable (10%–90%, default 30%).
 """
 import sys
 from PySide6.QtWidgets import (
@@ -25,7 +30,7 @@ def pil_to_qpixmap(pil_img):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Contador de árboles — NEON BONA")
+        self.setWindowTitle("Contador de árboles — YOLO11n / HARV v2")
         self.resize(1100, 750)
 
         self.detector = TreeDetector()
@@ -34,7 +39,7 @@ class MainWindow(QMainWindow):
         central = QWidget()
         layout = QVBoxLayout(central)
 
-        # Barra superior
+        # --- Barra superior: botón + umbral ---
         top = QHBoxLayout()
         self.btn_open = QPushButton("Subir ortofoto…")
         self.btn_open.clicked.connect(self.open_image)
@@ -42,22 +47,22 @@ class MainWindow(QMainWindow):
 
         top.addWidget(QLabel("Confianza mínima:"))
         self.spin_conf = QSpinBox()
-        self.spin_conf.setRange(1, 50)
-        self.spin_conf.setValue(1)
+        self.spin_conf.setRange(10, 90)   # 10%–90%
+        self.spin_conf.setValue(30)       # default 30%
         self.spin_conf.setSuffix(" %")
         self.spin_conf.valueChanged.connect(self.update_conf)
         top.addWidget(self.spin_conf)
         top.addStretch()
         layout.addLayout(top)
 
-        # Imagen
+        # --- Preview de imagen ---
         self.label_img = QLabel("Sube una ortofoto para empezar")
         self.label_img.setAlignment(Qt.AlignCenter)
         self.label_img.setMinimumSize(900, 550)
         self.label_img.setStyleSheet("border: 1px solid #888; background: #f0f0f0;")
         layout.addWidget(self.label_img)
 
-        # Resultado
+        # --- Resultado (conteo) ---
         self.label_result = QLabel("Árboles detectados: —")
         self.label_result.setStyleSheet("font-size: 22px; font-weight: bold;")
         self.label_result.setAlignment(Qt.AlignCenter)
@@ -65,10 +70,12 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(central)
 
+    # ------------------------------------------------------------------
     def update_conf(self):
         self.detector.conf = self.spin_conf.value() / 100.0
-        print(f"[conf] {self.detector.conf:.3f}")
+        print(f"[conf] {self.detector.conf:.2f}")
 
+    # ------------------------------------------------------------------
     def open_image(self):
         print("[1] open_image")
         path, _ = QFileDialog.getOpenFileName(
@@ -86,7 +93,10 @@ class MainWindow(QMainWindow):
             pix = pil_to_qpixmap(annotated)
             print(f"[5] QPixmap {pix.width()}x{pix.height()}")
             self.label_img.setPixmap(pix.scaled(
-                self.label_img.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                self.label_img.size(),
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation,
+            ))
             self.label_result.setText(f"Árboles detectados: {n}")
             print("[6] UI actualizada")
         except Exception as e:

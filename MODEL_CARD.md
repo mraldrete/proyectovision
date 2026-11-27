@@ -20,13 +20,20 @@
 - Decisiones legales o de valoración económica sin revisión humana.
 
 ## Métricas (test set)
+
 | Métrica | Valor |
 |---|---|
-| mAP@0.5 | [ ] |
-| mAP@0.5:0.95 | [ ] |
-| Precision | [ ] |
-| Recall | [ ] |
-| F1 (macro) | [calcular: 2PR/(P+R)] |
+| mAP@0.5 | **0.587** |
+| mAP@0.5:0.95 | 0.192 |
+| Precision | 0.645 |
+| Recall | 0.555 |
+| F1 (macro) | 0.596 |
+
+## Limitaciones
+- Test de 17 imágenes (alta varianza).
+- Solo sitio HARV (Massachusetts). No validado en Latinoamérica.
+- Train con GT algorítmico (ForestGEO deepforest).
+- **Usable con revisión humana**, no producción autónoma.
 
 ## Sesgos identificados
 - **Geográfico:** entrenado solo en Wroclaw (Polonia); no validado en Latinoamérica.

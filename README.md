@@ -27,47 +27,45 @@ Este proyecto entrena un detector de árboles (YOLOv8n fine-tuned) sobre el data
   python src/prepare_bona_v2.py
 
 ## 4. Arquitectura
-Modelo: YOLOv8n fine-tuned desde pesos COCO (50–150 épocas, imgsz=640, early stopping).
+### Comparación de arquitecturas (HARV v2)
 
-Diagrama: entrada (orto 1024×1024) → YOLOv8n (backbone CSP + FPN + head) → cajas + confianza → NMS → conteo.
+| Run | Dataset | Train imgs | Modelo | mAP50 (test) | mAP50-95 (test) | P (test) | R (test) | Params | Tamaño |
+|---|---|---|---|---|---|---|---|---|---|
+| A | HARV v1 | 245 | YOLOv8n | 0.375 | 0.117 | 0.523 | 0.306 | 3.0 M | 6.2 MB |
+| B | HARV v2 | 440 | YOLOv8n | 0.512 | 0.163 | 0.610 | 0.510 | 3.0 M | 6.2 MB |
+| **C** | **HARV v2** | **440** | **YOLO11n (elegido)** | **0.587** | **0.192** | **0.645** | **0.555** | **2.58 M** | **5.5 MB** |
+| Ref | BONA | ~300 | YOLOv8n | 0.036 | 0.011 | 0.022 | 0.532 | 3.0 M | 6.0 MB |
 
-Alternativa comparada: YOLOv8n preentrenado en COCO sin fine-tuning.
-
-Comparación de arquitecturas
-Modelo	mAP@0.5	mAP@0.5:0.95	Parámetros	Tamaño (MB)	Latencia (ms/img)
-
-YOLOv8n fine-tuned (elegido)	0.0363	0.0114	3.0 M	6.0	12.8 (MPS)
-
-YOLOv8n COCO (sin fine-tuning)	0.0000	0.0000	3.2 M	6.5	12.8 (MPS)
-
-Justificación: El modelo preentrenado en COCO no detecta árboles (mAP=0) porque no conoce la clase. El fine-tuning sobre NEON BONA aporta +0.036 mAP. Se intentó YOLOv8s (más capacidad), pero en MPS tardaba 20+ min/época por presión de memoria, inviable para el tiempo del proyecto. YOLOv8n ofrece el mejor balance latencia/tamaño/exactitud alcanzable con estos datos.
+**Justificación:** YOLO11n sobre HARV v2 es el modelo final. Gana en mAP, mAP50-95, precisión y recall frente a YOLOv8n, con 14% menos parámetros y 11% menos tamaño. La comparación aísla el efecto del dataset (A→B: +0.137 mAP50) y de la arquitectura (B→C: +0.075 mAP50). El dataset explica la mayor parte de la mejora (BONA→HARV: +0.339 mAP50) por el split espacial, el test enmascarado y el GT ForestGEO.
 
 ## 5. Resultados principales
-Métricas en test (2019, OOD temporal)
+M## 5. Resultados principales
 
-Métrica	Valor
+### Modelo final: YOLO11n sobre HARV v2
 
-mAP@0.5	0.0363
+| Métrica | Valor (test, 17 imgs) |
+|---|---|
+| **mAP@0.5** | **0.587** |
+| mAP@0.5:0.95 | 0.192 |
+| Precision | 0.645 |
+| Recall | 0.555 |
+| Parámetros | 2.58 M |
+| Tamaño | 5.5 MB |
+| Latencia (MPS) | 22.6 ms/img |
 
-mAP@0.5:0.95	0.0114
+**Comparación con baseline BONA:** mAP50 0.036 → 0.587 (**16× mejor**). Causa principal: mejor split (espacial + test enmascarado) y GT más limpio (ForestGEO).
 
-Precision	0.0221
 
-Recall	0.532
+### Modelo final: YOLO11n sobre HARV v2
 
-Comparación de versiones
-
-Versión	Train imgs	mAP@0.5	Recall	Causa
-
-v1 (1 árbol/img)	407	0.0005	0.02	Colapso: fondo domina
-
-v2 (multi-árbol)	127	0.037	0.25	Desbalance 1 vs 55
-
-v3 (filtrado ≥5)	80	0.041	0.186	Pocos datos
-
-v4 (STRIDE=128, elegido)	~300	0.036	0.532	Mejor recall, sobre-detecta
-
-Figuras: docs/figuras/entrenamiento_v2/results.png, confusion_matrix.png.
+| Métrica | Valor (test, 17 imgs) |
+|---|---|
+| mAP@0.5 | **0.587** |
+| mAP@0.5:0.95 | 0.192 |
+| Precision | 0.645 |
+| Recall | 0.555 |
+| Parámetros | 2.58 M |
+| Tamaño | 5.5 MB |
 
 ## 6. Instalación y reproducción (≤ 5 comandos)
     ```bash
@@ -103,6 +101,14 @@ No usar en producción sin revisión humana.
 Trabajo futuro: más anotación humana (los 7,946 hand_* del dataset NEON) o segmentación con los hand_polygon.
 
 Dataset descartado: Wroclaw (Filipstrozik/satellite_trees_wroclaw_2024) se descartó por GT desalineado (auditoría en docs/analisis_errores.md).
+
+- **Test HARV de 17 imágenes** → alta varianza (mAP ±0.03).
+
+- **Un solo sitio NEON** (HARV). No validado en otros sitios.
+
+- **Train con GT algorítmico** (`deepforest`), no 100% humano.
+
+- **BONA descartado para producción** por fuga espacial y GT ruidoso (mAP=0.036). Se conserva como referencia metodológica.
 
 ## 10. Uso de IA generativa y créditos
 IA generativa: ChatGPT/Claude usados para redacción de documentación, revisión de código y generación de plantillas de scripts.

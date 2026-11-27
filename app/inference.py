@@ -1,13 +1,19 @@
-"""Inferencia: carga YOLO y predice sobre una imagen."""
+"""Inferencia: carga YOLO y predice sobre una imagen.
+
+Modelo final: YOLO11n fine-tuned sobre HARV v2.
+  - mAP50 (test) = 0.587, precision = 0.645, recall = 0.555
+  - Entrenado con imgsz=512, por eso la inferencia usa 512.
+  - conf por defecto 0.3 (el modelo es preciso; no necesita umbral bajo).
+"""
 from pathlib import Path
 from PIL import Image
 from ultralytics import YOLO
 
-WEIGHTS = Path("runs_bona/yolov8n_bona_v4/weights/best.pt")
+WEIGHTS = Path("runs_harv/yolo11n_harv_v2/weights/best.pt")
 
 
 class TreeDetector:
-    def __init__(self, weights=WEIGHTS, conf=0.01, imgsz=640):
+    def __init__(self, weights=WEIGHTS, conf=0.3, imgsz=512):
         self.model = YOLO(str(weights))
         self.conf = conf
         self.imgsz = imgsz
